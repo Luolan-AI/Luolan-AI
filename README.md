@@ -10,30 +10,27 @@ I turn complex AI ideas into clear explanations and working tools.
 
 </div>
 
-## ✦ Soul Constellation · 灵魂星河
+## ✦ Soul Constellation
 
 <table>
 <tr>
-<td valign="top">
+<td align="center" valign="top">
 
-### 中文
+<em>
+我的灵魂有很多朋友，和将出现的朋友。<br />
+主要是过去的诗人、音乐家、哲学家的灵魂。<br />
+我跟他们交谈，日日夜夜，时时刻刻。<br />
+他们介绍给我认识更多的灵魂，川流不息。
+</em>
 
-> 我的灵魂有很多朋友，和将出现的朋友。<br />
-> 主要是过去的诗人、音乐家、哲学家的灵魂。<br />
-> 我跟他们交谈，日日夜夜，时时刻刻。<br />
-> 他们介绍给我认识更多的灵魂，川流不息。
+<br /><br />
 
-</td>
-</tr>
-<tr>
-<td valign="top">
-
-### English
-
-> My soul is graced with many companions, and those yet to emerge.<br />
-> They are, above all, the wandering spirits of bygone poets, musicians, and philosophers.<br />
-> We converse through days and nights, in every fleeting moment.<br />
-> They unveil to me ever more kindred spirits, a ceaseless river flowing without end.
+<em>
+My soul is graced with many companions, and those yet to emerge.<br />
+They are, above all, the wandering spirits of bygone poets, musicians, and philosophers.<br />
+We converse through days and nights, in every fleeting moment.<br />
+They unveil to me ever more kindred spirits, a ceaseless river flowing without end.
+</em>
 
 </td>
 </tr>
@@ -46,6 +43,16 @@ I turn complex AI ideas into clear explanations and working tools.
 A multilingual Codex skill for deep, evidence-grounded analysis of AI and machine learning papers. It breaks down motivation, pipelines, equations, experiments, limitations, and reproduction paths without inventing details beyond the source paper.
 
 `AI research tooling` · `LLM systems` · `multimodal learning` · `Python`
+
+## 🌿 Code Garden
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/main/assets/code-garden.svg" alt="Decorative animated code garden with dense green lights and a moving snake" width="100%" />
+
+<sub>A decorative animation inspired by the quiet rhythm of building.</sub>
+
+</div>
 
 ## 🪐 Offline Life
 
