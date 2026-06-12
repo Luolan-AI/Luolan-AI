@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/main/assets/header.svg" alt="Lan Luo AI" width="100%" />
+<img src="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/main/assets/header.svg" alt="Between Proofs and Poetry" width="100%" />
 
 # Hi, I'm Lan Luo🌊
 
@@ -10,12 +10,7 @@ I turn complex AI ideas into clear explanations and working tools.
 
 </div>
 
-## ✦ Soul Constellation
-
-<table>
-<tr>
-<td align="center" valign="top">
-
+<div align="center">
 <em>
 我的灵魂有很多朋友，和将出现的朋友。<br />
 主要是过去的诗人、音乐家、哲学家的灵魂。<br />
@@ -31,10 +26,9 @@ They are, above all, the wandering spirits of bygone poets, musicians, and philo
 We converse through days and nights, in every fleeting moment.<br />
 They unveil to me ever more kindred spirits, a ceaseless river flowing without end.
 </em>
+</div>
 
-</td>
-</tr>
-</table>
+<br />
 
 ## 🔭 What I'm Building
 
