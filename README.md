@@ -44,16 +44,6 @@ A multilingual Codex skill for deep, evidence-grounded analysis of AI and machin
 
 `AI research tooling` · `LLM systems` · `multimodal learning` · `Python`
 
-## 🌿 Code Garden
-
-<div align="center">
-
-<img src="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/main/assets/code-garden.svg" alt="Decorative animated code garden with dense green lights and a moving snake" width="100%" />
-
-<sub>A decorative animation inspired by the quiet rhythm of building.</sub>
-
-</div>
-
 ## 🪐 Offline Life
 
 > *Just as I seek elegance in rigorous proofs and algorithms, I look for it in the physical and mental world.*
