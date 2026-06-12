@@ -10,11 +10,11 @@ I turn complex AI ideas into clear explanations and working tools.
 
 </div>
 
-## ✦ A Constellation of Souls · 灵魂星河
+## ✦ Soul Constellation · 灵魂星河
 
 <table>
 <tr>
-<td width="50%" valign="top">
+<td valign="top">
 
 ### 中文
 
@@ -24,7 +24,9 @@ I turn complex AI ideas into clear explanations and working tools.
 > 他们介绍给我认识更多的灵魂，川流不息。
 
 </td>
-<td width="50%" valign="top">
+</tr>
+<tr>
+<td valign="top">
 
 ### English
 
