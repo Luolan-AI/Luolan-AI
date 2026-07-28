@@ -30,14 +30,14 @@ As a secondary interest, I explore **computational cognitive science and NeuroAI
 <picture>
   <source
     media="(prefers-color-scheme: dark)"
-    srcset="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake-dark.svg"
+    srcset="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake-dark.svg?v=blue-glow-20260728"
   />
   <source
     media="(prefers-color-scheme: light)"
-    srcset="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake.svg"
+    srcset="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake.svg?v=blue-glow-20260728"
   />
   <img
     alt="A snake eating Luolan-AI's GitHub contribution dots"
-    src="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake.svg"
+    src="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake.svg?v=blue-glow-20260728"
   />
 </picture>
