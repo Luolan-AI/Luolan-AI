@@ -17,13 +17,15 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Generate contribution grid snake
-        uses: Platane/snk/svg-only@v3
-        with:
-          github_user_name: ${{ github.repository_owner }}
-          outputs: |
-            dist/github-contribution-grid-snake.svg?palette=github-light&color_snake=#2ea043
-            dist/github-contribution-grid-snake-dark.svg?palette=github-dark&color_snake=#39d353
+      - name: Check out profile repository
+        uses: actions/checkout@v4
+
+      - name: Generate growing contribution snake
+        run: |
+          node scripts/generate-growing-snake.mjs \
+            "${GITHUB_REPOSITORY_OWNER}" \
+            dist/github-contribution-grid-snake.svg \
+            dist/github-contribution-grid-snake-dark.svg
 
       - name: Publish animation to output branch
         run: |
