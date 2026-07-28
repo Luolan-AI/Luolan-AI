@@ -24,3 +24,20 @@ As a secondary interest, I explore **computational cognitive science and NeuroAI
 - **[long-context-learning-log](https://github.com/Luolan-AI/long-context-learning-log)** — A living research log for long-context learning and experiments.
 
 > *Between proofs and poetry.*
+
+## Contribution Snake
+
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake-dark.svg"
+  />
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake.svg"
+  />
+  <img
+    alt="A snake eating Luolan-AI's GitHub contribution dots"
+    src="https://raw.githubusercontent.com/Luolan-AI/Luolan-AI/output/github-contribution-grid-snake.svg"
+  />
+</picture>
