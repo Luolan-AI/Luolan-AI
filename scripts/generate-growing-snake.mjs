@@ -64,25 +64,33 @@ if (activeContributions.length === 0) {
   throw new Error("The contribution grid does not contain any edible cells");
 }
 
-const orderedContributions = orderTargets(activeContributions);
-const firstTarget = contributionCenter(orderedContributions[0]);
+const gridRoute = createGridRoute();
+const firstTarget = contributionCenter(gridRoute[0]);
 const waypoints = [
   { x: -56, y: firstTarget.y },
   { x: -40, y: firstTarget.y },
   { x: -24, y: firstTarget.y },
   { x: -8, y: firstTarget.y },
-  ...orderedContributions.map(contributionCenter),
+  ...gridRoute.map(contributionCenter),
 ];
-const startDistance = 48;
-const curve = createSmoothCurve(waypoints);
+const curve = createRoundedCurve(waypoints, 5);
+validateNoSelfIntersections(curve.samples);
+const startDistance = curve.waypointDistances[3];
 const totalPathLength = curve.samples.at(-1).distance;
-const animationSeconds = clamp(totalPathLength / 78 + 4, 32, 56);
+const animationSeconds = clamp(totalPathLength / 150 + 3, 36, 46);
 
 const targetDistances = new Map();
-for (let targetIndex = 0; targetIndex < orderedContributions.length; targetIndex += 1) {
-  const waypointIndex = targetIndex + 4;
+const gridRouteIndexes = new Map(
+  gridRoute.map((contribution, index) => [
+    contributionKey(contribution),
+    index,
+  ]),
+);
+for (const contribution of activeContributions) {
+  const routeIndex = gridRouteIndexes.get(contributionKey(contribution));
+  const waypointIndex = routeIndex + 4;
   targetDistances.set(
-    contributionKey(orderedContributions[targetIndex]),
+    contributionKey(contribution),
     curve.waypointDistances[waypointIndex],
   );
 }
@@ -104,7 +112,7 @@ const tailDistances = [];
 const headPositions = [];
 const headAngles = [];
 let eatenCount = 0;
-const orderedTargetDistances = orderedContributions
+const orderedTargetDistances = activeContributions
   .map((contribution) => targetDistances.get(contributionKey(contribution)))
   .sort((left, right) => left - right);
 
@@ -158,8 +166,8 @@ const themes = {
     empty: "#ebedf0",
     levels: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
     snake: "#2ea043",
+    snakeGlow: "#39d353",
     snakeOutline: "#0d5f2d",
-    highlight: "#ffffff99",
     eye: "#ffffff",
     pupil: "#0d1117",
     tongue: "#e34c6f",
@@ -170,8 +178,8 @@ const themes = {
     empty: "#161b22",
     levels: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
     snake: "#39d353",
+    snakeGlow: "#56d364",
     snakeOutline: "#0d5f2d",
-    highlight: "#ffffff80",
     eye: "#ffffff",
     pupil: "#0d1117",
     tongue: "#ff7b9c",
@@ -222,28 +230,34 @@ async function writeSvg(outputPath, theme) {
   const duration = formatNumber(animationSeconds);
   const svg = `<svg viewBox="-24 -8 ${width + 40} ${height + 16}" width="${width + 40}" height="${height + 16}" xmlns="http://www.w3.org/2000/svg">
   <title>${escapeXml(username)}'s lively growing contribution snake</title>
-  <desc>A smooth animated snake curves between contribution cells, eats them, and grows longer.</desc>
+  <desc>A continuous animated snake follows a smooth non-self-intersecting route, eats contribution cells, and grows longer.</desc>
   <rect x="-24" y="-8" width="${width + 40}" height="${height + 16}" fill="${theme.background}"/>
   <defs>
     <filter id="snake-shadow" x="-30%" y="-30%" width="160%" height="160%">
       <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity="0.28"/>
     </filter>
+    <linearGradient id="snake-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${theme.snake}"/>
+      <stop offset="52%" stop-color="${theme.snakeGlow}">
+        <animate attributeName="stop-color" values="${theme.snakeGlow};${theme.snake};${theme.snakeGlow}" dur="1.8s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="${theme.snake}"/>
+    </linearGradient>
     <mask id="snake-body-mask" x="-24" y="-8" width="${width + 40}" height="${height + 16}" maskUnits="userSpaceOnUse">
       <rect x="-24" y="-8" width="${width + 40}" height="${height + 16}" fill="black"/>
-      <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="white" stroke-width="19" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${headDashes[0]}">
+      <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="white" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${headDashes[0]}">
         <animate attributeName="stroke-dasharray" dur="${duration}s" repeatCount="indefinite" calcMode="linear" values="${headDashes.join(";")}" keyTimes="${keyTimes.join(";")}"/>
       </path>
-      <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="black" stroke-width="21" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${tailDashes[0]}">
+      <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="black" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${tailDashes[0]}">
         <animate attributeName="stroke-dasharray" dur="${duration}s" repeatCount="indefinite" calcMode="linear" values="${tailDashes.join(";")}" keyTimes="${keyTimes.join(";")}"/>
       </path>
     </mask>
   </defs>
   <g>${cells}</g>
   <g filter="url(#snake-shadow)" mask="url(#snake-body-mask)">
-    <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="${theme.snakeOutline}" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="${theme.snake}" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="${theme.highlight}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 13">
-      <animate attributeName="stroke-dashoffset" from="0" to="-15" dur="0.8s" repeatCount="indefinite"/>
+    <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="${theme.snakeOutline}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${curve.pathData}" pathLength="${formatNumber(totalPathLength)}" fill="none" stroke="url(#snake-gradient)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+      <animate attributeName="stroke-width" values="8.6;9.4;8.6" keyTimes="0;0.5;1" dur="1.2s" repeatCount="indefinite"/>
     </path>
   </g>
   <g filter="url(#snake-shadow)">
@@ -251,13 +265,13 @@ async function writeSvg(outputPath, theme) {
     <g>
       <animateTransform attributeName="transform" type="rotate" dur="${duration}s" repeatCount="indefinite" calcMode="linear" values="${angleValues.join(";")}" keyTimes="${keyTimes.join(";")}"/>
       <g>
-        <animateTransform attributeName="transform" type="scale" values="1 1;1.07 0.95;1 1" keyTimes="0;0.5;1" dur="0.7s" repeatCount="indefinite"/>
-        <ellipse cx="0" cy="0" rx="10" ry="7.5" fill="${theme.snake}" stroke="${theme.snakeOutline}" stroke-width="2"/>
-        <circle cx="3.5" cy="-3.2" r="2.2" fill="${theme.eye}"/>
-        <circle cx="3.5" cy="3.2" r="2.2" fill="${theme.eye}"/>
-        <circle cx="4.4" cy="-3.2" r="0.9" fill="${theme.pupil}"/>
-        <circle cx="4.4" cy="3.2" r="0.9" fill="${theme.pupil}"/>
-        <path d="M9,0 L14,0 M14,0 L17,-2 M14,0 L17,2" fill="none" stroke="${theme.tongue}" stroke-width="1.5" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="scale" values="1 1;1.05 0.97;1 1" keyTimes="0;0.5;1" dur="0.7s" repeatCount="indefinite"/>
+        <ellipse cx="0" cy="0" rx="8" ry="6.2" fill="${theme.snake}" stroke="${theme.snakeOutline}" stroke-width="1.5"/>
+        <circle cx="2.8" cy="-2.5" r="1.7" fill="${theme.eye}"/>
+        <circle cx="2.8" cy="2.5" r="1.7" fill="${theme.eye}"/>
+        <circle cx="3.5" cy="-2.5" r="0.7" fill="${theme.pupil}"/>
+        <circle cx="3.5" cy="2.5" r="0.7" fill="${theme.pupil}"/>
+        <path d="M7.5,0 L12,0 M12,0 L14.5,-1.8 M12,0 L14.5,1.8" fill="none" stroke="${theme.tongue}" stroke-width="1.3" stroke-linecap="round">
           <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.55;0.65;0.8;1" dur="1.4s" repeatCount="indefinite"/>
         </path>
       </g>
@@ -269,105 +283,75 @@ async function writeSvg(outputPath, theme) {
   await writeFile(outputPath, svg, "utf8");
 }
 
-function orderTargets(targets) {
-  const remaining = targets.map((target) => ({ ...target }));
-  const start = remaining.reduce((best, target) => {
-    if (target.column < best.column) return target;
-    if (
-      target.column === best.column &&
-      Math.abs(target.row - 3) < Math.abs(best.row - 3)
-    ) {
-      return target;
-    }
-    return best;
-  });
-  remaining.splice(remaining.indexOf(start), 1);
-
-  const ordered = [start];
-  let previousDirection = { x: 1, y: 0 };
-
-  while (remaining.length > 0) {
-    const current = ordered.at(-1);
-    let bestIndex = 0;
-    let bestScore = Number.POSITIVE_INFINITY;
-
-    for (let index = 0; index < remaining.length; index += 1) {
-      const candidate = remaining[index];
-      const dx = candidate.column - current.column;
-      const dy = candidate.row - current.row;
-      const distance = Math.hypot(dx, dy);
-      const direction = { x: dx / distance, y: dy / distance };
-      const cosine =
-        direction.x * previousDirection.x +
-        direction.y * previousDirection.y;
-      const turnPenalty = (1 - cosine) * Math.min(3.5, distance * 0.45);
-      const verticalPenalty = Math.abs(dy) * 0.05;
-      const deterministicJitter =
-        ((candidate.column * 17 + candidate.row * 31) % 11) / 100;
-      const score =
-        distance + turnPenalty + verticalPenalty + deterministicJitter;
-
-      if (score < bestScore) {
-        bestScore = score;
-        bestIndex = index;
+function createGridRoute() {
+  const route = [];
+  for (let column = 0; column < columnCount; column += 1) {
+    if (column % 2 === 0) {
+      for (let row = 0; row < rowCount; row += 1) {
+        route.push({ row, column });
+      }
+    } else {
+      for (let row = rowCount - 1; row >= 0; row -= 1) {
+        route.push({ row, column });
       }
     }
-
-    const next = remaining.splice(bestIndex, 1)[0];
-    const dx = next.column - current.column;
-    const dy = next.row - current.row;
-    const distance = Math.hypot(dx, dy);
-    previousDirection = { x: dx / distance, y: dy / distance };
-    ordered.push(next);
   }
-
-  return ordered;
+  return route;
 }
 
-function createSmoothCurve(points) {
+function createRoundedCurve(points, cornerRadius) {
   const pathParts = [`M${formatPoint(points[0])}`];
   const samples = [{ ...points[0], distance: 0 }];
-  const waypointDistances = [0];
+  const waypointDistances = Array(points.length).fill(0);
   let totalDistance = 0;
+  let cursor = points[0];
 
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const previous = points[Math.max(0, index - 1)];
-    const start = points[index];
-    const end = points[index + 1];
-    const next = points[Math.min(points.length - 1, index + 2)];
-    const controlOne = clampPoint({
-      x: start.x + ((end.x - previous.x) / 6) * 0.72,
-      y: start.y + ((end.y - previous.y) / 6) * 0.72,
-    });
-    const controlTwo = clampPoint({
-      x: end.x - ((next.x - start.x) / 6) * 0.72,
-      y: end.y - ((next.y - start.y) / 6) * 0.72,
-    });
-    pathParts.push(
-      `C${formatPoint(controlOne)} ${formatPoint(controlTwo)} ${formatPoint(end)}`,
-    );
+  for (let index = 1; index < points.length; index += 1) {
+    const current = points[index];
+    const next = points[index + 1];
 
-    const directDistance = Math.hypot(end.x - start.x, end.y - start.y);
-    const sampleCount = Math.max(4, Math.ceil(directDistance / 3));
-    let lastSample = samples.at(-1);
-
-    for (let sampleIndex = 1; sampleIndex <= sampleCount; sampleIndex += 1) {
-      const time = sampleIndex / sampleCount;
-      const sample = cubicPoint(
-        start,
-        controlOne,
-        controlTwo,
-        end,
-        time,
-      );
-      totalDistance += Math.hypot(
-        sample.x - lastSample.x,
-        sample.y - lastSample.y,
-      );
-      lastSample = { ...sample, distance: totalDistance };
-      samples.push(lastSample);
+    if (!next) {
+      pathParts.push(`L${formatPoint(current)}`);
+      sampleLine(cursor, current);
+      waypointDistances[index] = totalDistance;
+      cursor = current;
+      continue;
     }
-    waypointDistances.push(totalDistance);
+
+    const previous = points[index - 1];
+    const incoming = unitVector(previous, current);
+    const outgoing = unitVector(current, next);
+    const cross = incoming.x * outgoing.y - incoming.y * outgoing.x;
+    const dot = incoming.x * outgoing.x + incoming.y * outgoing.y;
+
+    if (Math.abs(cross) < 0.0001 && dot > 0.9999) {
+      pathParts.push(`L${formatPoint(current)}`);
+      sampleLine(cursor, current);
+      waypointDistances[index] = totalDistance;
+      cursor = current;
+      continue;
+    }
+
+    const radius = Math.min(
+      cornerRadius,
+      distance(previous, current) / 3,
+      distance(current, next) / 3,
+    );
+    const before = {
+      x: current.x - incoming.x * radius,
+      y: current.y - incoming.y * radius,
+    };
+    const after = {
+      x: current.x + outgoing.x * radius,
+      y: current.y + outgoing.y * radius,
+    };
+
+    pathParts.push(`L${formatPoint(before)}`);
+    sampleLine(cursor, before);
+    pathParts.push(`Q${formatPoint(current)} ${formatPoint(after)}`);
+    const turnDistance = sampleQuadratic(before, current, after);
+    waypointDistances[index] = turnDistance;
+    cursor = after;
   }
 
   return {
@@ -375,29 +359,89 @@ function createSmoothCurve(points) {
     samples,
     waypointDistances,
   };
+
+  function appendSample(point) {
+    totalDistance += distance(samples.at(-1), point);
+    samples.push({ ...point, distance: totalDistance });
+  }
+
+  function sampleLine(start, end) {
+    const sampleCount = Math.max(1, Math.ceil(distance(start, end) / 3));
+    for (let sampleIndex = 1; sampleIndex <= sampleCount; sampleIndex += 1) {
+      const time = sampleIndex / sampleCount;
+      appendSample({
+        x: start.x + (end.x - start.x) * time,
+        y: start.y + (end.y - start.y) * time,
+      });
+    }
+  }
+
+  function sampleQuadratic(start, control, end) {
+    const sampleCount = 6;
+    let middleDistance = totalDistance;
+    for (let sampleIndex = 1; sampleIndex <= sampleCount; sampleIndex += 1) {
+      const time = sampleIndex / sampleCount;
+      const inverse = 1 - time;
+      appendSample({
+        x:
+          inverse ** 2 * start.x +
+          2 * inverse * time * control.x +
+          time ** 2 * end.x,
+        y:
+          inverse ** 2 * start.y +
+          2 * inverse * time * control.y +
+          time ** 2 * end.y,
+      });
+      if (sampleIndex === sampleCount / 2) {
+        middleDistance = totalDistance;
+      }
+    }
+    return middleDistance;
+  }
 }
 
-function cubicPoint(start, controlOne, controlTwo, end, time) {
-  const inverse = 1 - time;
+function validateNoSelfIntersections(samples) {
+  const epsilon = 0.0001;
+  for (let left = 0; left < samples.length - 1; left += 1) {
+    const a = samples[left];
+    const b = samples[left + 1];
+    for (let right = left + 2; right < samples.length - 1; right += 1) {
+      const c = samples[right];
+      const d = samples[right + 1];
+      if (segmentsIntersect(a, b, c, d, epsilon)) {
+        throw new Error(
+          `Generated route self-intersects near samples ${left} and ${right}`,
+        );
+      }
+    }
+  }
+}
+
+function segmentsIntersect(a, b, c, d, epsilon) {
+  const abC = orientation(a, b, c);
+  const abD = orientation(a, b, d);
+  const cdA = orientation(c, d, a);
+  const cdB = orientation(c, d, b);
+  return (
+    abC * abD < -epsilon &&
+    cdA * cdB < -epsilon
+  );
+}
+
+function orientation(a, b, c) {
+  return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+}
+
+function unitVector(start, end) {
+  const length = distance(start, end);
   return {
-    x:
-      inverse ** 3 * start.x +
-      3 * inverse ** 2 * time * controlOne.x +
-      3 * inverse * time ** 2 * controlTwo.x +
-      time ** 3 * end.x,
-    y:
-      inverse ** 3 * start.y +
-      3 * inverse ** 2 * time * controlOne.y +
-      3 * inverse * time ** 2 * controlTwo.y +
-      time ** 3 * end.y,
+    x: (end.x - start.x) / length,
+    y: (end.y - start.y) / length,
   };
 }
 
-function clampPoint(point) {
-  return {
-    x: clamp(point.x, -56, columnCount * gridStep - 8),
-    y: clamp(point.y, 8, rowCount * gridStep - 8),
-  };
+function distance(start, end) {
+  return Math.hypot(end.x - start.x, end.y - start.y);
 }
 
 function contributionCenter({ row, column }) {
